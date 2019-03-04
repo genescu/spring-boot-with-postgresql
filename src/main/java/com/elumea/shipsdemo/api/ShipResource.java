@@ -4,15 +4,16 @@ import com.elumea.shipsdemo.entity.ShipEntity;
 import com.elumea.shipsdemo.exceptions.ResourceNotFoundException;
 import com.elumea.shipsdemo.repository.ShipRepository;
 import com.elumea.shipsdemo.service.ServiceUtils;
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
+import java.net.URI;
+import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
@@ -68,9 +69,10 @@ public class ShipResource {
   }
 
   @GetMapping(value = "/port/{id}/{startTime}/{endTime}")
-  public List<Map<Object, Integer>> shipsInPortSummary(
+  public Object shipsInPortSummary(
       @PathVariable long id, @PathVariable String startTime, @PathVariable String endTime) {
     return shipRepository.findShipsInPortSummary(
-        id, serviceUtils.formatToDate(startTime), serviceUtils.formatToDate(endTime));
+            id, serviceUtils.formatToDate(startTime), serviceUtils.formatToDate(endTime))
+        .toArray()[0];
   }
 }
