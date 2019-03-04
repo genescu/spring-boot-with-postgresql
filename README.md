@@ -23,13 +23,28 @@ spring.datasource.password=docker
 
 #3. Retrieve some data
 
+
 http://localhost:8090/ships/1
+
+curl -X GET "http://localhost:8090/ships/1"
+
 
 A.
 /port/{id}/{dateTime}
-http://localhost:8090/port/2/04.01.2016%2020:55:23
+
 http://localhost:8090/port/2/1.1.2016%2012:00
+http://localhost:8090/port/2/04.01.2016%2012:00
+
+curl -X GET "http://localhost:8090/port/2/1.1.2016%2012:00"
+curl -X GET "http://localhost:8090/port/2/04.01.2016%2012:00"
+        
 
 B.
+
 /port/{id}/{startTime}/{endTime}
+
 http://localhost:8090/port/2/1.1.2016%2012:00/04.01.2017%2020:55:23
+curl -X GET "http://localhost:8090/port/2/1.1.2016%2012:00/04.01.2017%2020:55:23"
+
+
+
