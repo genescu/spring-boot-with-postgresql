@@ -6,6 +6,17 @@ mkdir -p $HOME/docker/volumes/postgres
 
 docker run --rm   --name pg-docker -e POSTGRES_PASSWORD=docker -d -p 5432:5432 -v $HOME/docker/volumes/postgres:/var/lib/postgresql/data  postgres
 
+http://localhost:8090/h2-console/
+
+
+# Database
+spring.datasource.url=jdbc:postgresql://localhost:5432/postgres
+
+spring.datasource.username=postgres
+
+spring.datasource.password=docker
+
+
 
 #2. Upload CSV file http://localhost:8090/upload
 
