@@ -1,30 +1,32 @@
 package com.elumea.shipsdemo.entity;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(
     name = "ship",
     indexes = {@Index(columnList = "time_started"), @Index(columnList = "time_finished")})
 public class ShipEntity {
+
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long id;
+  private long id;
 
-  @NotNull private String name;
+  private String name;
 
-  @NotNull private Integer imo;
+  private Integer imo;
 
-  @NotNull private String length;
+  private String length;
 
-  @NotNull private Long port_id;
+  private Long port_id;
 
-  @NotNull private String time_started;
+  // @JsonFormat  (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS",timezone =
+  // "Europe/Berlin", locale = "en_GB")
+  private String time_started;
 
-  @NotNull private String time_finished;
-
-  public ShipEntity() {}
+  // @JsonFormat  (shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss.SSS",timezone =
+  // "Europe/Berlin", locale = "en_GB")
+  private String time_finished;
 
   public Long getId() {
     return id;
@@ -64,6 +66,10 @@ public class ShipEntity {
 
   public void setPort_id(Long port_id) {
     this.port_id = port_id;
+  }
+
+  public void setId(long id) {
+    this.id = id;
   }
 
   public String getTime_started() {

@@ -1,85 +1,57 @@
 package com.elumea.shipsdemo.controller;
 
-import com.elumea.shipsdemo.entity.ShipEntity;
+import com.elumea.shipsdemo.entity.ShipInPort;
 import com.elumea.shipsdemo.repository.ShipRepository;
 import com.elumea.shipsdemo.service.ServiceUtils;
-import com.elumea.shipsdemo.storage.StorageFileNotFoundException;
-import com.elumea.shipsdemo.storage.StorageService;
-import java.io.IOException;
-import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.io.Resource;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import org.springframework.web.servlet.mvc.method.annotation.MvcUriComponentsBuilder;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Map;
 
 @Controller
 public class ShipController {
 
-  private final StorageService storageService;
+  @Autowired private ShipRepository shipRepository;
 
-  @Autowired
-  public ShipController(StorageService storageService) {
-    this.storageService = storageService;
+  private ServiceUtils serviceUtils = ServiceUtils.getInstance();
+
+  public ShipInPort findShipsInPortSummary(long port_id, String startTime, String endTime) {
+
+    Map<String, Object> obj = shipRepository.queryShipsInPortSummary(port_id, startTime, endTime);
+    ShipInPort shipInPort = new ShipInPort();
+
+    shipInPort.setUnique((Integer) obj.get("unique"));
+    shipInPort.setAvgTime((String) obj.get("avgTime"));
+
+    shipInPort.setMaxTime((String) obj.get("maxTime"));
+    shipInPort.setMaxTime_imo((Integer) obj.get("maxTime_imo"));
+
+    shipInPort.setMinTime((String) obj.get("minTime"));
+    shipInPort.setMinTime_imo((Integer) obj.get("minTime_imo"));
+
+    return shipInPort;
   }
 
-  @Autowired private ShipRepository repository;
+  public List<ShipInPort> findShipsInPortByDate(long port_id, String dateTime) {
+    List<Map<String, Object>> objList = shipRepository.queryShipsInPortByDate(port_id, dateTime);
+    ShipInPort shipInPort;
 
-  @GetMapping("/upload")
-  public String listUploadedFiles(Model model) throws IOException {
+    List<ShipInPort> listShip = new ArrayList<>();
 
-    model.addAttribute(
-        "files",
-        storageService
-            .loadAll()
-            .map(
-                path ->
-                    MvcUriComponentsBuilder.fromMethodName(
-                            ShipController.class, "serveFile", path.getFileName().toString())
-                        .build()
-                        .toString())
-            .collect(Collectors.toList()));
+    for (int i = 0; i < objList.size(); i++) {
 
-    return "uploadForm";
-  }
+      shipInPort = new ShipInPort();
+      shipInPort.setId((Integer) objList.get(i).get("id"));
+      shipInPort.setLength((String) objList.get(i).get("length"));
+      shipInPort.setName((String) objList.get(i).get("name"));
+      shipInPort.setTime_started((String) objList.get(i).get("time_started"));
+      shipInPort.setImo((Integer) objList.get(i).get("imo"));
 
-  @GetMapping("/files/{filename:.+}")
-  @ResponseBody
-  public ResponseEntity<Resource> serveFile(@PathVariable String filename) {
-
-    Resource file = storageService.loadAsResource(filename);
-    return ResponseEntity.ok()
-        .header(
-            HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + file.getFilename() + "\"")
-        .body(file);
-  }
-
-  @PostMapping("/upload")
-  public String handleFileUpload(
-      @RequestParam("file") MultipartFile file, RedirectAttributes redirectAttributes) {
-    try {
-      storageService.store(file);
-
-      repository.saveAll(ServiceUtils.read(ShipEntity.class, file.getInputStream()));
-
-    } catch (IOException e) {
-
-      e.printStackTrace();
+      listShip.add(shipInPort);
     }
 
-    redirectAttributes.addFlashAttribute(
-        "message", "You successfully uploaded " + file.getOriginalFilename() + "!");
-
-    return "redirect:/upload";
-  }
-
-  @ExceptionHandler(StorageFileNotFoundException.class)
-  public ResponseEntity<?> handleStorageFileNotFound(StorageFileNotFoundException exc) {
-    return ResponseEntity.notFound().build();
+    return listShip;
   }
 }

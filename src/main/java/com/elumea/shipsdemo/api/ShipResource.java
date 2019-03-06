@@ -1,25 +1,27 @@
 package com.elumea.shipsdemo.api;
 
+import com.elumea.shipsdemo.controller.ShipController;
 import com.elumea.shipsdemo.entity.ShipEntity;
+import com.elumea.shipsdemo.entity.ShipInPort;
 import com.elumea.shipsdemo.exceptions.ResourceNotFoundException;
 import com.elumea.shipsdemo.repository.ShipRepository;
 import com.elumea.shipsdemo.service.ServiceUtils;
+import java.net.URI;
+import java.util.List;
+import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import java.net.URI;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-
 @RestController
 @RequestMapping(produces = MediaType.APPLICATION_JSON_VALUE)
 public class ShipResource {
 
   @Autowired private ShipRepository shipRepository;
+
+  @Autowired private ShipController shipController;
 
   private ServiceUtils serviceUtils = ServiceUtils.getInstance();
 
@@ -63,16 +65,14 @@ public class ShipResource {
   }
 
   @GetMapping(value = "/port/{id}/{dateTime}")
-  public List<Map<Object, Integer>> shipsInPort(
-      @PathVariable long id, @PathVariable String dateTime) {
-    return shipRepository.findShipsInPortByDate(id, serviceUtils.formatToDate(dateTime));
+  public List<ShipInPort> shipsInPort(@PathVariable long id, @PathVariable String dateTime) {
+    return shipController.findShipsInPortByDate(id, serviceUtils.formatToDate(dateTime));
   }
 
   @GetMapping(value = "/port/{id}/{startTime}/{endTime}")
-  public Object shipsInPortSummary(
+  public ShipInPort shipsInPortSummary(
       @PathVariable long id, @PathVariable String startTime, @PathVariable String endTime) {
-    return shipRepository.findShipsInPortSummary(
-            id, serviceUtils.formatToDate(startTime), serviceUtils.formatToDate(endTime))
-        .toArray()[0];
+    return shipController.findShipsInPortSummary(
+        id, serviceUtils.formatToDate(startTime), serviceUtils.formatToDate(endTime));
   }
 }
